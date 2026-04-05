@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLQ Scheduler Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">⚙</div>
+                <div>
+                    <h2>MLQ Dashboard</h2>
+                    <p>Scheduling Visualizer</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#top" class="nav-item active">Overview</a>
+                <a href="#controls" class="nav-item">Controls</a>
+                <a href="#processes" class="nav-item">Processes</a>
+                <a href="#ganttSection" class="nav-item">Gantt Chart</a>
+                <a href="#statsSection" class="nav-item">Process Statistics</a>
+                <a href="#summarySection" class="nav-item">Summary</a>
+            </nav>
+        </aside>
+
+        <main class="main-content" id="top">
+            <header class="hero-panel reveal">
+                <div>
+                    <div class="hero-badge">MULTI-LEVEL QUEUE SCHEDULING</div>
+                    <h1>MLQ Scheduling Simulator</h1>
+                    
+                </div>
+            </header>
+
+            <section class="stats-grid reveal">
+                <div class="stat-tile">
+                    <span class="stat-label">Average Completion</span>
+                    <span class="stat-value" id="tileCompletion">--</span>
+                </div>
+                <div class="stat-tile">
+                    <span class="stat-label">Average Turnaround</span>
+                    <span class="stat-value" id="tileTurnaround">--</span>
+                </div>
+                <div class="stat-tile">
+                    <span class="stat-label">Average Waiting</span>
+                    <span class="stat-value" id="tileWaiting">--</span>
+                </div>
+                <div class="stat-tile">
+                    <span class="stat-label">Average Response</span>
+                    <span class="stat-value" id="tileResponse">--</span>
+                </div>
+            </section>
+
+            <section class="dashboard-card reveal" id="controls">
+                <div class="section-title">
+                    <h2>Queue Controls</h2>
+                    </div>
+
+                <div class="table-wrap">
+                    <table id="policyTable">
+                        <tr>
+                            <th>Queue</th>
+                            <th>Algorithm</th>
+                            <th>Quantum</th>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="button-row">
+                    <button type="button" onclick="addQueueRow()">Add Queue</button>
+                    <button type="button" onclick="deleteQueueRow()">Delete Queue</button>
+                    <button type="button" onclick="clearQueueRows()" class="clear-btn">Clear Queues</button>
+                </div>
+            </section>
+
+            <section class="dashboard-card reveal">
+                <div class="section-title">
+                    <h2>Aging / Starvation Controls</h2>
+                    </div>
+
+                <div class="control-grid">
+                    <label class="control-box">
+                        <span>Enable Aging</span>
+                        <input type="checkbox" id="agingEnabled" checked>
+                    </label>
+
+                    <label class="control-box">
+                        <span>Aging Threshold</span>
+                        <input type="number" id="agingThreshold" value="8" min="0">
+                    </label>
+
+                    <label class="control-box">
+                        <span>Migrate on Aging</span>
+                        <input type="checkbox" id="migrateOnAging" checked>
+                    </label>
+                </div>
+            </section>
+
+            <section class="dashboard-card reveal" id="processes">
+                <div class="section-title">
+                    <h2>Processes</h2>
+                    <p>Enter process ID, arrival time, burst time, and queue number.</p>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="inputTable">
+                        <tr>
+                            <th>PID</th>
+                            <th>Arrival</th>
+                            <th>Burst</th>
+                            <th>Queue</th>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="button-row">
+                    <button type="button" onclick="addRow()">Add Process</button>
+                    <button type="button" onclick="addSampleData()">Sample Data</button>
+                    <button type="button" onclick="runScheduler()" class="run-btn">Run</button>
+                    <button type="button" onclick="clearAllData()" class="clear-btn">Clear</button>
+                </div>
+
+                <div id="messageBox"></div>
+            </section>
+
+            <section class="dashboard-card reveal" id="ganttSection">
+                <div class="section-title">
+                    <h2>Gantt Chart</h2>
+                </div>
+
+                <div id="ganttWrapper">
+                    <div id="gantt"></div>
+                </div>
+            </section>
+
+            <section class="dashboard-card reveal" id="statsSection">
+                <div class="section-title">
+                    <h2>Process Statistics</h2>
+                    </div>
+
+                <div class="table-wrap">
+                    <table id="statsTable">
+                        <tr>
+                            <th>PID</th>
+                            <th>Arrival</th>
+                            <th>Burst</th>
+                            <th>Original Queue</th>
+                            <th>Final Queue</th>
+                            <th>Completion</th>
+                            <th>Turnaround</th>
+                            <th>Waiting</th>
+                            <th>Response</th>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <section class="bottom-grid reveal" id="summarySection">
+                <div class="dashboard-card">
+                    <div class="section-title">
+                        <h2>Summary</h2>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table id="summaryTable">
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="section-title">
+                        <h2>Notes</h2>
+                    </div>
+                    <ul id="notesList"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 50 },
+                color: { value: "#8fdcff" },
+                size: { value: 3 },
+                opacity: { value: 0.35 },
+                move: { speed: 1.1 },
+                line_linked: {
+                    enable: true,
+                    distance: 130,
+                    color: "#3ebeff",
+                    opacity: 0.18,
+                    width: 1
+                }
+            },
+            interactivity: {
+                events: {
+                    onhover: { enable: true, mode: "grab" }
+                }
+            }
+        });
+    </script>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
